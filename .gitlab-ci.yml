@@ -13,7 +13,7 @@
 docker-build:
   # Use the official docker image.
   image: docker:latest
-  stages: build
+  stage: build
   services:
     - docker:dind
   before_script:
