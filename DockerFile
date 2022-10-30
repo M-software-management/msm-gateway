@@ -1,7 +1,7 @@
 FROM node:latest
-WORKDIR /app
-COPY package.json ./index
+WORKDIR /
+COPY package.json ./
 RUN npm install
-COPY . ./index
+COPY . .
 EXPOSE 8800
-CMD [ "npm", "start" ]
+CMD [ "npm", "index.js" ]
