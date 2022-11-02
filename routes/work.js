@@ -4,7 +4,7 @@ import Authtoken from "../jwtauth.js"
 
 const router = express.Router()
 
-router.get("/", Getworks)
+router.get("/", Authtoken, Getworks)
 router.get("/:id", Getwork)
 router.post("/add", Addwork)
 
