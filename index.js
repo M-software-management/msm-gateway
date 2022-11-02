@@ -18,10 +18,10 @@ app.use(cors({
 }));
 app.use(express.json());
 app.use(cookieParser());
-app.use("/api/auth", authroutes)
-app.use("/api/user", usersroutes)
-app.use("/api/work", workroutes)
-app.use("/api/shift", shiftroutes)
+app.use("/v1/auth", authroutes)
+app.use("/v1/user", usersroutes)
+app.use("/v1/work", workroutes)
+app.use("/v1/shift", shiftroutes)
 
 app.listen(8800, () => {
     console.log('connected to backend!')
