@@ -59,7 +59,6 @@ export const Getshifts = (req, res) => {
   }
 
   export const Pickshift = (req, res) => {
-    
     const token = req.cookies.access_token
       if(!token) return res.status(403).json("not authenticated!")
       
@@ -69,7 +68,7 @@ export const Getshifts = (req, res) => {
     const q = "INSERT INTO shift-request (`shift_id`,`user_id`) VALUES ?"
     const values = [
       req.body.shift_id,
-      req.userinfo.id,
+      userinfo.id,
     ]
 
     db.query(q, [values], (err, data)=> {
