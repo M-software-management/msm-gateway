@@ -59,11 +59,10 @@ export const Getshifts = (req, res) => {
   }
 
   export const Pickshift = (req, res) => {
-    const q = "INSERT INTO shift-request (`location_id`,`shift_id`,`user_id`) VALUES ?"
+    const q = "INSERT INTO shift-request (`shift_id`,`user_id`) VALUES ?"
     const values = [
-      req.body.location_id,
       req.body.shift_id,
-      req.body.user_id,
+      req.userinfo.id,
     ]
 
     db.query(q, [values], (err, data)=> {
