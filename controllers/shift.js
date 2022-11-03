@@ -59,6 +59,13 @@ export const Getshifts = (req, res) => {
   }
 
   export const Pickshift = (req, res) => {
+    
+    const token = req.cookies.access_token
+      if(!token) return res.status(403).json("not authenticated!")
+      
+      jwt.verify(token,"msmtest", (err, userinfo)=>{
+        if(err) return res.status(403).json("Token not vaild!")
+    
     const q = "INSERT INTO shift-request (`shift_id`,`user_id`) VALUES ?"
     const values = [
       req.body.shift_id,
@@ -68,5 +75,6 @@ export const Getshifts = (req, res) => {
     db.query(q, [values], (err, data)=> {
       if(err) return res.json("An Error has happened")
       return res.json("Shift request made!")
+    })
     })
   }
