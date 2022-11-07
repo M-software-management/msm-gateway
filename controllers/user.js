@@ -47,7 +47,7 @@ export const Getusers = (req, res) => {
     
     const salt = bcrypt.genSaltSync(10);
       const hash = bcrypt.hashSync(req.body.password, salt);
-    const q = "UPDATE users SET `username`=?,`email`=?,`password`=? WHERE user_id=? "
+    const q = "UPDATE users SET `username`=?,`email`=?,`password`=? `role`=? WHERE user_id=? "
   
     db.query(q, [req.body.username,req.body.email,hash,req.params.id], (err, data) => {
       if (err) return res.status(500).json(err);
