@@ -10,7 +10,7 @@ export const Getusers = (req, res) => {
     if(err) return res.status(403).json("Token not vaild!")
   const q = req.query.Work_location ? 
   "SELECT `username`,`email`,`role` FROM sfhs.users WHERE work_location=?;"
-  :"SELECT `username`,`email`,`role` FROM sfhs.users";
+  :"SELECT `user_id`,`username`,`email`,`role` FROM sfhs.users";
 
   db.query(q, [req.query.Work_location], (err, data) => {
     if (err) return res.status(500).json(err);

@@ -16,7 +16,7 @@ export const register = (req, res) => {
       const hash = bcrypt.hashSync(req.body.password, salt);
   
       const q = "INSERT INTO users(`username`,`email`,`password`,`work_location`,`role`) VALUES (?)";
-      const values = [req.body.username, req.body.email, hash, req.body.worklocation, req.body.admin];
+      const values = [req.body.username, req.body.email, hash, req.body.worklocation, req.body.role];
   
       db.query(q, [values], (err, data) => {
         if (err) return res.status(500).json(err);
@@ -44,7 +44,7 @@ export const register = (req, res) => {
       if (!isPasswordCorrect)
         return res.status(400).json("Wrong email  or password!");
   
-      const Token = jwt.sign({ id: data[0].user_id,role: data[0].role }, "msmtest");
+      const Token = jwt.sign({ id: data[0].user_id,role: data[0].role,work_id: data[0].Work_location }, "msmtest");
       const { password, ...other } = data[0];
   
       res.cookie("access_token", Token, {

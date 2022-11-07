@@ -48,3 +48,13 @@ export const Getworks = (req, res) => {
     })
     })
   }
+
+  export const geturl = (req, res) => {
+    const q =  "SELECT * FROM sfhs.Location WHERE slug=?;"
+  
+    db.query(q, [req.params.slug], (err, data) => {
+      if (err) return res.status(500).json(err);
+  
+      return res.status(200).json(data[0]);
+    });
+  };
