@@ -84,7 +84,7 @@ export const Getshifts = (req, res) => {
   export const Getrequest = (req, res) => {
 
     
-    const q = "SELECT * FROM request r join users u ON r.user_id=u.user_id join Location L on r.location_id=L.location_uid\ INNER JOIN shifts ON r.shift_id = shifts.shift_id ";
+    const q = "SELECT `request_id`, r.`location_id`, r.`shift_id`, r.`user_id`, r.`approved`, u.`username`, L.`Name`, `date` FROM request r join users u ON r.user_id=u.user_id join Location L on r.location_id=L.location_uid\ INNER JOIN shifts ON r.shift_id = shifts.shift_id ";
     
       db.query(q,[req.params.id], (err, data)=> {
         if (err) return res.json(err)
@@ -132,7 +132,7 @@ export const Getshifts = (req, res) => {
 
       export const Getonerequest = (req, res) => {
         
-        const q = "SELECT * FROM request r join users u ON r.user_id=u.user_id join Location L on r.location_id=L.location_uid\ INNER JOIN shifts ON r.shift_id = shifts.shift_id WHERE request_id=?";
+        const q = "SELECT `request_id`, r.`location_id`, r.`shift_id`, r.`user_id`, r.`approved`, u.`username`, L.`Name`, `date` FROM request r join users u ON r.user_id=u.user_id join Location L on r.location_id=L.location_uid\ INNER JOIN shifts ON r.shift_id = shifts.shift_id WHERE request_id=?";
         
           db.query(q,[req.params.id], (err, data)=> {
             if (err) return res.json(err)
@@ -148,3 +148,14 @@ export const Getshifts = (req, res) => {
             return res.json("Request has been Deleted")
           })
         }
+
+
+        export const Getuserequest = (req, res) => {
+        
+          const q = "SELECT `request_id`, r.`location_id`, r.`shift_id`, r.`user_id`, r.`approved`, u.`username`, L.`Name`, `date` FROM request r join users u ON r.user_id=u.user_id join Location L on r.location_id=L.location_uid\ INNER JOIN shifts s ON r.shift_id = s.shift_id WHERE r.user_id=?";
+          
+            db.query(q,[req.query.user_id], (err, data)=> {
+              if (err) return res.json(err)
+              return res.status(200).json(data);
+            });
+          };
