@@ -13,18 +13,12 @@ export const Getworks = (req, res) => {
 
 
   export const Getwork = (req, res) => {
-    const token = req.cookies.access_token
-      if(!token) return res.status(403).json("not authenticated!")
-      
-      jwt.verify(token,"msmtest", (err, userinfo)=>{
-        if(err) return res.status(403).json("Token not vaild!")
     const q = "SELECT * FROM sfhs.Location WHERE location_uid=?;"
   
     db.query(q, [req.params.id], (err, data) => {
       if (err) return res.status(500).json(err);
   
       return res.status(200).json(data[0]);
-    })
     });
   };
 
@@ -56,5 +50,16 @@ export const Getworks = (req, res) => {
       if (err) return res.status(500).json(err);
   
       return res.status(200).json(data[0]);
+    });
+  };
+
+
+  export const updatework = (req, res) => {
+    const q = "UPDATE Location SET `name`=?,`banner`=?,`pfp`=?,`admin_id`=? WHERE location_uid=? "
+  
+    db.query(q, [req.body.name,req.body.banner,req.body.pfp,req.body.admin,req.params.id], (err, data) => {
+      if (err) return res.status(500).json(err);
+  
+      return res.status(200).json("updated");
     });
   };

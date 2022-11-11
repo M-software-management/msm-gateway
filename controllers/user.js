@@ -47,7 +47,7 @@ export const Getusers = (req, res) => {
     
     const salt = bcrypt.genSaltSync(10);
       const hash = bcrypt.hashSync(req.body.password, salt);
-    const q = "UPDATE users SET `username`=?,`email`=?,`password`=? `role`=? WHERE user_id=? "
+    const q = "UPDATE users SET `username`=?,`email`=?,`password`=?,`role`=? WHERE user_id=? "
   
     db.query(q, [req.body.username,req.body.email,hash,req.body.role,req.params.id], (err, data) => {
       if (err) return res.status(500).json(err);
@@ -75,3 +75,12 @@ export const Getusers = (req, res) => {
     })
     });
   };
+
+  export const deleteuser = (req, res) => {
+        
+    const q = "DELETE FROM users WHERE `user_id`= ?"
+    db.query(q, [req.params.id], (err, data)=> {
+      if(err) return res.json(err)
+      return res.json("User has been Deleted")
+    })
+  }

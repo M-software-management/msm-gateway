@@ -1,13 +1,15 @@
 import express from "express"
-import {Getusers, Getuser, updateuser, getself} from "../controllers/user.js"
+import {Getusers, Getuser, updateuser, getself, deleteuser} from "../controllers/user.js"
 import {Adminonly, overlord} from "../jwtauth-role.js"
+import Authtoken from '../jwtauth.js'
 
 const router = express.Router()
 
 router.get("/", overlord ,Getusers)
-router.get("/:id", Getuser)
+router.get("/:id", Adminonly,Getuser)
 router.put("/:id", updateuser)
 router.get("/me/self", getself)
+router.delete("/:id", Authtoken ,Adminonly, deleteuser)
 
 
 

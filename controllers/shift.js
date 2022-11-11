@@ -66,7 +66,7 @@ export const Getshifts = (req, res) => {
       jwt.verify(token,"msmtest", (err, userinfo)=>{
         if(err) return res.status(403).json("Token not vaild!")
     
-    const q = "INSERT INTO `shift-request` (`location_id`,`shift_id`,`user_id`) VALUES (?)"
+    const q = "INSERT INTO request (`location_id`,`shift_id`,`user_id`) VALUES (?)"
     const values = [
       userinfo.work_id,
       req.params.id,
@@ -82,29 +82,23 @@ export const Getshifts = (req, res) => {
 
 
   export const Getrequest = (req, res) => {
-    const token = req.cookies.access_token
-    if(!token) return res.status(403).json("not authenticated!")
+
     
-    jwt.verify(token,"msmtest", (err, userinfo)=>{
-      if(err) return res.status(403).json("Token not vaild!")
-    
-    const q = "SELECT * FROM `shift-request` r join users u ON r.user_id=u.user_id join Location L on r.location_id=L.location_uid\ INNER JOIN shifts ON r.shift_id = shifts.shift_id ";
+    const q = "SELECT * FROM request r join users u ON r.user_id=u.user_id join Location L on r.location_id=L.location_uid\ INNER JOIN shifts ON r.shift_id = shifts.shift_id ";
     
       db.query(q,[req.params.id], (err, data)=> {
         if (err) return res.json(err)
         return res.status(200).json(data);
-      })
       });
     };
 
     export const Updateshift = (req, res) => {
       
-      const q = "UPDATE sfhs.shifts SET `date`=?,`hours`=?,`desc`=? WHERE shift_id=?"
-      const values = [req.body.date,req.body.hours,req.body.desc,req.params.id];
+      const q = "UPDATE shifts SET `date`=?,`hours`=?,`desc`=? WHERE shift_id=?"
   
-      db.query(q, [values], (err, data)=> {
+      db.query(q, [req.body.date, req.body.hours, req.body.desc, req.params.id,], (err, data)=> {
         if(err) return res.json(err)
-        return res.json("Shift has been Changed")
+        return res.json("Shift has been update")
       })
     }
 
@@ -122,3 +116,35 @@ export const Getshifts = (req, res) => {
         })
         });
       };
+
+
+      export const Approverequest = (req, res) => {
+      
+        const q = "UPDATE request SET `approved`= true WHERE request_id=?"
+    
+        db.query(q, [req.params.id], (err, data)=> {
+          if(err) return res.json(err)
+          return res.json("Shift has been Approved")
+        })
+      }
+
+
+
+      export const Getonerequest = (req, res) => {
+        
+        const q = "SELECT * FROM request r join users u ON r.user_id=u.user_id join Location L on r.location_id=L.location_uid\ INNER JOIN shifts ON r.shift_id = shifts.shift_id WHERE request_id=?";
+        
+          db.query(q,[req.params.id], (err, data)=> {
+            if (err) return res.json(err)
+            return res.status(200).json(data);
+          });
+        };
+
+        export const Deleterequest = (req, res) => {
+              
+          const q = "DELETE FROM request WHERE `request_id`= ?"
+          db.query(q, [req.params.id], (err, data)=> {
+            if(err) return res.json("An Error has happened")
+            return res.json("Request has been Deleted")
+          })
+        }
