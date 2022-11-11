@@ -27,6 +27,7 @@ app.use("/v1/user", usersroutes)
 app.use("/v1/work", workroutes)
 app.use("/v1/shift", shiftroutes)
 app.use("/v1/cdn", uploadroutes)
+app.use("/uploads", express.static("./uploads"))
 
 
 app.listen(8800, () => {
