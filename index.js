@@ -6,12 +6,6 @@ import shiftroutes from "./routes/shift.js"
 import uploadroutes from "./s3.js"
 import cors from 'cors'
 import cookieParser from 'cookie-parser'
-import multer from 'multer'
-import multers3 from 'multer-s3'
-import * as path from 'path';
-import * as fs from 'fs';
-import * as util from 'util';
-const unlinkFile = util.promisify(fs.unlink)
 
 
 
