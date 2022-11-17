@@ -2,20 +2,15 @@ import { db } from "../db.js";
 import jwt from "jsonwebtoken";
 
 export const Getshifts = (req, res) => {
-  const token = req.cookies.access_token
-  if(!token) return res.status(403).json("not authenticated!")
-  
-  jwt.verify(token,"msmtest", (err, userinfo)=>{
-    if(err) return res.status(403).json("Token not vaild!")
   
   const q = req.query.location_id ? 
-    "SELECT * FROM sfhs.shifts WHERE location_id=?"
-    :"SELECT * FROM sfhs.shifts";
+    "SELECT * FROM sfhs.shifts WHERE location_id=? AND `hide_shift`= 1 "
+    :"SELECT * FROM sfhs.shifts ";
   
     db.query(q,[req.query.location_id], (err, data)=> {
       if (err) return res.json(err)
       return res.status(200).json(data);
-    })
+    
     });
   };
 
@@ -94,9 +89,9 @@ export const Getshifts = (req, res) => {
 
     export const Updateshift = (req, res) => {
       
-      const q = "UPDATE shifts SET `date`=?,`hours`=?,`desc`=? WHERE shift_id=?"
+      const q = "UPDATE shifts SET `date`=?,`hours`=?,`desc`=?,`hide_shift`=? WHERE shift_id=?"
   
-      db.query(q, [req.body.date, req.body.hours, req.body.desc, req.params.id,], (err, data)=> {
+      db.query(q, [req.body.date, req.body.hours, req.body.desc,req.body.hide,req.params.id,], (err, data)=> {
         if(err) return res.json(err)
         return res.json("Shift has been update")
       })
@@ -159,3 +154,19 @@ export const Getshifts = (req, res) => {
               return res.status(200).json(data);
             });
           };
+
+
+          export const GetshiftHide = (req, res) => {
+            const token = req.cookies.access_token
+            if(!token) return res.status(403).json("not authenticated!")
+            
+            jwt.verify(token,"msmtest", (err, userinfo)=>{
+              if(err) return res.status(403).json("Token not vaild!")
+            
+            const q =  "SELECT `shift_id`,`hide_shift` FROM sfhs.shifts WHERE `hide_shift`= 1 AND shift_id=? "
+              db.query(q,[req.params.id], (err, data)=> {
+                if (err) return res.json(err)
+                return res.status(200).json(data);
+              })
+              });
+            };

@@ -7,9 +7,9 @@ const router = express.Router()
 
 router.get("/", overlord ,Getusers)
 router.get("/:id", Adminonly,Getuser)
-router.put("/:id", updateuser)
+router.put("/acm/:id", updateuser)
 router.get("/me/self", getself)
-router.delete("/:id", Authtoken ,Adminonly, deleteuser)
+router.delete("/acm/:id", Authtoken ,Adminonly, deleteuser)
 
 
 
