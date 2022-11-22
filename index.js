@@ -19,7 +19,7 @@ app.use((req,res,next)=>{
 
 
 app.use(cors({
-    origin: "https://shifts.rmsn.us",
+    origin: "http://localhost:3000",
 }));
 app.use(express.json());
 app.use(cookieParser());

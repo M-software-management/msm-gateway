@@ -84,3 +84,20 @@ export const Getusers = (req, res) => {
       return res.json("User has been Deleted")
     })
   }
+
+
+  export const Getuserwork = (req, res) => {
+    const token = req.cookies.access_token
+  if(!token) return res.status(403).json("not authenticated!")
+  
+  jwt.verify(token,"msmtest", (err, userinfo)=>{
+    if(err) return res.status(403).json("Token not vaild!")
+
+    const q = "SELECT `Work_location`, `Name`, `banner`, `slug`, `hide` FROM users u JOIN Location L ON u.Work_location=L.location_uid WHERE user_id=?;"
+  
+    db.query(q, [userinfo.id], (err, data) => {
+      if (err) return res.status(500).json(err);
+      return res.status(200).json(data);
+    })
+    });
+  };

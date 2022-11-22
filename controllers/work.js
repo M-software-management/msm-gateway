@@ -15,13 +15,24 @@ client.set = util.promisify(client.set)
 
 export const Getworks = (req, res) => {
         
-        const q = "SELECT * FROM sfhs.Location;"
+        const q = "SELECT * FROM sfhs.Location WHERE hide=1;"
          db.query(q, [req.params.id], (err, data) => {
             if (err) return res.status(500).json(err);
             return res.status(200).json(data);
     
     });
   };
+
+
+  export const Getworksadmin = (req, res) => {
+        
+    const q = "SELECT * FROM sfhs.Location;"
+     db.query(q, [req.params.id], (err, data) => {
+        if (err) return res.status(500).json(err);
+        return res.status(200).json(data);
+
+});
+};
 
 
   export const Getwork = (req, res) => {
@@ -67,9 +78,9 @@ export const Getworks = (req, res) => {
 
 
   export const updatework = (req, res) => {
-    const q = "UPDATE Location SET `name`=?,`banner`=?,`pfp`=?,`admin_id`=?,`slug`=? WHERE location_uid=? "
+    const q = "UPDATE Location SET `name`=?,`banner`=?,`pfp`=?,`admin_id`=?,`slug`=?,`hide`=? WHERE location_uid=? "
   
-    db.query(q, [req.body.name,req.body.banner,req.body.pfp,req.body.admin,req.body.slug,req.params.id], (err, data) => {
+    db.query(q, [req.body.name,req.body.banner,req.body.pfp,req.body.admin,req.body.slug,req.body.hide,req.params.id], (err, data) => {
       if (err) return res.status(500).json(err);
   
       return res.status(200).json("updated");

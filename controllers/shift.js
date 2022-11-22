@@ -22,11 +22,12 @@ export const Getshifts = (req, res) => {
       jwt.verify(token,"msmtest", (err, userinfo)=>{
         if(err) return res.status(403).json("Token not vaild!")
     
-    const q = "INSERT INTO shifts (`date`,`hours`,`desc`,`location_id`) VALUES (?)"
+    const q = "INSERT INTO shifts (`date`,`hours`,`desc`,`hide_shift`,`location_id`) VALUES (?)"
     const values = [
       req.body.date,
       req.body.hours,
       req.body.description,
+      req.body.hide_shift,
       req.body.location,
     ];
 
@@ -91,7 +92,7 @@ export const Getshifts = (req, res) => {
       
       const q = "UPDATE shifts SET `date`=?,`hours`=?,`desc`=?,`hide_shift`=? WHERE shift_id=?"
   
-      db.query(q, [req.body.date, req.body.hours, req.body.desc,req.body.hide,req.params.id,], (err, data)=> {
+      db.query(q, [req.body.date, req.body.hours, req.body.desc, req.body.show,req.params.id,], (err, data)=> {
         if(err) return res.json(err)
         return res.json("Shift has been update")
       })

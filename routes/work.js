@@ -1,5 +1,5 @@
 import express from "express"
-import {Getworks, Getwork, Addwork, geturl, deletework} from "../controllers/work.js"
+import {Getworks, Getwork, Addwork, geturl, deletework, Getworksadmin} from "../controllers/work.js"
 import Authtoken from "../jwtauth.js"
 import {Adminonly, overlord} from "../jwtauth-role.js"
 import { updatework } from "../controllers/work.js"
@@ -13,6 +13,7 @@ router.get("/info/:slug", Authtoken, geturl)
 router.post("/acm/add", Addwork)
 router.put("/acm/:id", updatework)
 router.delete("/acm/:id", deletework)
+router.get("/acm/all", Authtoken, Getworksadmin)
 
 
 
