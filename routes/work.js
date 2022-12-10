@@ -1,21 +1,32 @@
 import express from "express"
-import {Getworks, Getwork, Addwork, geturl, deletework, Getworksadmin} from "../controllers/work.js"
+import {Getworks, Getwork, Addwork, geturl, deletework, Getworksadmin, getshifturl} from "../controllers/work.js"
 import Authtoken from "../jwtauth.js"
 import {Adminonly, overlord} from "../jwtauth-role.js"
 import { updatework } from "../controllers/work.js"
-import { Cache } from "../redis.js"
+import multer from 'multer'
 
 const router = express.Router()
 
-router.get("/", Authtoken, Getworks)
+
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+      cb(null, "./uploads");
+    },
+    filename: function (req, file, cb) {
+      cb(null, Date.now() + file.originalname);
+    },
+  });
+  
+  const upload = multer({ storage });
+
+router.get("/", Getworks)
 router.get("/:id", Getwork)
-router.get("/info/:slug", Authtoken, geturl)
-router.post("/acm/add", Addwork)
+router.get("/info/:slug", geturl)
+router.post("/acm/add", upload.single('file') ,Addwork)
 router.put("/acm/:id", updatework)
 router.delete("/acm/:id", deletework)
 router.get("/acm/all", Authtoken, Getworksadmin)
-
-
+router.get("/shifts/:url", getshifturl)
 
 
 

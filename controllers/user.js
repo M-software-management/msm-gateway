@@ -101,3 +101,31 @@ export const Getusers = (req, res) => {
     })
     });
   };
+
+
+  export const Getuseremail = (req, res) => {
+
+    const q = "SELECT * FROM sfhs.users WHERE email=?;"
+  
+    db.query(q, [req.params.email], (err, data) => {
+      if (err) return res.status(500).json(err);
+      const { password, ...info } = data[0]
+      return res.status(200).json(info);
+    });
+  };
+
+  export const Getallworkuser = (req, res) => {
+    const token = req.cookies.access_token
+    if(!token) return res.status(403).json("not authenticated!")
+    
+    jwt.verify(token,"msmtest", (err, userinfo)=>{
+      if(err) return res.status(403).json("Token not vaild!")
+    const q = 
+    "SELECT `email` FROM sfhs.users WHERE work_location=?";
+  
+    db.query(q, [req.query.Work_location], (err, data) => {
+      if (err) return res.status(500).json(err);
+      return res.status(200).json(data);
+    })
+    });
+    };
