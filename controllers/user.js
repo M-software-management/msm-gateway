@@ -129,3 +129,16 @@ export const Getusers = (req, res) => {
     })
     });
     };
+
+
+
+
+    export const Getuserrmsr = (req, res) => {
+
+      const q = "SELECT `user_id` FROM request WHERE shift_id=?;"
+    
+      db.query(q, [req.params.id], (err, data) => {
+        if (err) return res.status(500).json(err);
+        return res.status(200).json(data);
+      });
+    };

@@ -10,6 +10,8 @@ import multer from 'multer'
 import Authtoken from './jwtauth.js'
 import nodemailer from 'nodemailer'
 import { Getallworkuser } from './controllers/user.js'
+import cron from 'cron'
+import {SendMailAll} from './cron.js'
 
 
 
@@ -32,8 +34,12 @@ app.use("/v1/auth", authroutes)
 app.use("/v1/user", usersroutes)
 app.use("/v1/work", workroutes)
 app.use("/v1/shift", shiftroutes)
-app.use("/v2/notification", notificationroutes)
+app.use("/v1/notification", notificationroutes)
 app.use("/uploads", Authtoken, express.static("./uploads"))
+app.get("/cron", SendMailAll)
+
+
+
 
 const router = express.Router()
 const storage = multer.diskStorage({
@@ -85,6 +91,10 @@ transporter.sendMail(mailinfo, function(error, info){
     }
 })
 })
+
+
+
+
 
 app.listen(8800, () => {
     console.log('connected to backend!')

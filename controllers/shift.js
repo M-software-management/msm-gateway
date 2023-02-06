@@ -1,5 +1,18 @@
 import { db } from "../db.js";
 import jwt from "jsonwebtoken";
+import { createClient } from 'redis';
+import util from 'util'
+
+
+//const client = createClient({
+  // url: 'redis://192.168.1.5:6379'
+//})
+  //await client.connect();
+
+  //client.set = util.promisify(client.set)
+
+  const ex = 3600
+
 
 export const Getshifts = (req, res) => {
   
@@ -128,11 +141,11 @@ export const Getshifts = (req, res) => {
 
       export const Getonerequest = (req, res) => {
         
-        const q = "SELECT `request_id`, r.`location_id`, r.`shift_id`, r.`user_id`, r.`approved`, u.`username`, L.`Name`, `date` FROM request r join users u ON r.user_id=u.user_id join Location L on r.location_id=L.location_uid\ INNER JOIN shifts ON r.shift_id = shifts.shift_id WHERE request_id=?";
+        const q = "SELECT `request_id`, r.`location_id`, r.`shift_id`, r.`user_id`, r.`approved`, u.`username`, L.`Name`, `date` FROM request r join users u ON r.user_id=u.user_id join Location L on r.location_id=L.location_uid JOIN shifts ON r.shift_id = shifts.shift_id WHERE request_id=?";
         
           db.query(q,[req.params.id], (err, data)=> {
             if (err) return res.json(err)
-            return res.status(200).json(data);
+            return res.status(200).json(data[0]);
           });
         };
 

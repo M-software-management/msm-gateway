@@ -1,10 +1,25 @@
 import express from "express"
-import {Getusers, Getuser, updateuser, getself, deleteuser, Getuserwork, Getuseremail, Getallworkuser} from "../controllers/user.js"
+import {Getusers, Getuser, updateuser, getself, deleteuser, Getuserwork, Getuseremail, Getallworkuser, Getuserrmsr} from "../controllers/user.js"
 import {Adminonly, overlord} from "../jwtauth-role.js"
 import Authtoken from '../jwtauth.js'
 import nodemailer from 'nodemailer'
 import jwt from "jsonwebtoken";
 import axios from "axios"
+import redis from 'redis'
+import util from 'util'
+import { createClient } from 'redis';
+import { db } from "../db.js";
+import bcrypt from "bcryptjs";
+
+
+//const client = createClient({
+  // url: 'redis://192.168.1.5:6379'
+//})
+  //await client.connect();
+
+  //client.set = util.promisify(client.set)
+
+  const ex = 3600
 
 const app = express();
 
@@ -21,15 +36,15 @@ const transporter = nodemailer.createTransport({
 
 
 const test = {
-    id: "3",
-    email: "lm",
-    password: "test",
+    id: "2",
+    email: "alligongaming@gmail.com",
+    password: "$2a$10$0DsqeL8g5Vvt47c2.VTzSufKUnWVR6sxEE0zgwPzIhwJFMGRL7RVe",
 }
 
 const JWT_SECRET = "msmtest"
 
 const router = express.Router()
-
+router.get("/getactive/2/2/2/2/4/:id", Getuserrmsr)
 router.get("/", Getusers)
 router.get("/:id", Getuser)
 router.get("/info/:email", Getuseremail)
@@ -39,21 +54,37 @@ router.delete("/acm/:id", Authtoken ,Adminonly, deleteuser)
 router.get("/work/all", Getuserwork)
 router.get("/acm/work/emails", Getallworkuser)
 
+ 
+export const getemail = async (req, res) => {
+    const q = "SELECT * FROM sfhs.users WHERE `email`=?;"
+  
+    db.query(q, [req.body], (err, data) => {
+      if (err) return res.status(500).json(err);
+      return (data);
+    });
+  };
 
-router.post("/password-link", (req, res)=>{
-    const { email } = req.body;
 
-    if(email){
+
+
+router.post("/password-link", async (req, res)=>{
+    const email = req.body.email;
+    const  user  =  getemail(email);
+
+    if(!user){
         res.send('user is not there');
         return;
     }
     const secret = JWT_SECRET;
     const payload = {
-        email: email,
-        id: test.id,
+        email: user,
+        id: user,
     }
     const token = jwt.sign(payload,secret, {expiresIn: '15m'})
-    const link = `http://localhost:3000/user/reset-password/${test.id}/${token}`
+    client.set('password-token',token,{
+        EX: ex,
+      })
+    const link = `http://localhost:3000/user/reset-password/${user}/${token}`
     console.log(link)
     res.send('Password reset link has been sent!')
     const mailinfo = {
@@ -74,7 +105,7 @@ router.post("/password-link", (req, res)=>{
 })
 
 
-router.get("/password-token/check/:id/:token", async (req,res) =>{
+router.post("/password-token/check/:id/:token", async (req,res) =>{
     const { id, token } = req.params;
 
     //const user = await axios.get(`http://localhost:8800/v1/user/${id}`);
@@ -85,9 +116,16 @@ router.get("/password-token/check/:id/:token", async (req,res) =>{
     const secret = JWT_SECRET;
     try{
         const verify = jwt.verify(token, secret);
-        res.send("verifed");
+        const salt = bcrypt.genSaltSync(10);
+        const hash = bcrypt.hashSync( salt);
+      const q = "UPDATE users SET `password`=? WHERE user_id=? "
+    
+      db.query(q, [req.body.password,id], (err, data) => {
+        if (err) return res.status(500).json(err);
+        return res.status(200).json("updated");
+      });
     }catch (error) {
-        res.send("Not Verifed")
+        res.send("Not Verfied!")
     }
 })
 
