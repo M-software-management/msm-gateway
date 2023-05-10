@@ -1,5 +1,5 @@
 import express from "express"
-import {Getusers, Getuser, updateuser, getself, deleteuser, Getuserwork, Getuseremail, Getallworkuser, Getuserrmsr} from "../controllers/user.js"
+import {Getusers, Getuser, updateuser, getself, deleteuser, Getuserwork, Getuseremail, Getallworkuser, updateuserNOT, Getgroup, Getgroup_2} from "../controllers/user.js"
 import {Adminonly, overlord} from "../jwtauth-role.js"
 import Authtoken from '../jwtauth.js'
 import nodemailer from 'nodemailer'
@@ -10,10 +10,13 @@ import util from 'util'
 import { createClient } from 'redis';
 import { db } from "../db.js";
 import bcrypt from "bcryptjs";
-
+import * as dotenv from 'dotenv'
+dotenv.config()
+import { transporter } from "../Mail.js"
+import { client } from "../db.js"
 
 //const client = createClient({
-  // url: 'redis://192.168.1.5:6379'
+  // url: 'redis://192.168.1.17:49199'
 //})
   //await client.connect();
 
@@ -25,51 +28,36 @@ const app = express();
 
 app.use(express.json());
 
-const transporter = nodemailer.createTransport({
-    host: "m16.siteground.biz",
-    port: 465,
-    auth:{
-        user:"contact@jeremymichaelsontreeservice.com",
-        pass:"contact2022",
-    }
-})
 
-
-const test = {
-    id: "2",
-    email: "alligongaming@gmail.com",
-    password: "$2a$10$0DsqeL8g5Vvt47c2.VTzSufKUnWVR6sxEE0zgwPzIhwJFMGRL7RVe",
-}
-
-const JWT_SECRET = "msmtest"
+const JWT_SECRET = process.env.jwt_sign
 
 const router = express.Router()
-router.get("/getactive/2/2/2/2/4/:id", Getuserrmsr)
-router.get("/", Getusers)
-router.get("/:id", Getuser)
-router.get("/info/:email", Getuseremail)
-router.put("/acm/:id", updateuser)
+
+router.get("/", Adminonly,Getusers)
+router.get("/:id", Adminonly, Getuser)
+router.get("/info/:email", Adminonly, Getuseremail)
+router.put("/acm/:id", Adminonly, updateuser)
+router.put("/update/self", updateuserNOT)
 router.get("/me/self", getself)
 router.delete("/acm/:id", Authtoken ,Adminonly, deleteuser)
 router.get("/work/all", Getuserwork)
-router.get("/acm/work/emails", Getallworkuser)
-
- 
-export const getemail = async (req, res) => {
-    const q = "SELECT * FROM sfhs.users WHERE `email`=?;"
-  
-    db.query(q, [req.body], (err, data) => {
-      if (err) return res.status(500).json(err);
-      return (data);
-    });
-  };
-
+router.get("/acm/work/emails", Adminonly, Getallworkuser)
+router.get("/groups/test/:id", Getgroup)
+router.get("/groups/:id", Getgroup_2)
 
 
 
 router.post("/password-link", async (req, res)=>{
+
+
+  const q = "SELECT `user_id`,`email` FROM sfhs.users WHERE `email`=?;"
+  
+    db.query(q, [req.body.email], (err, data) => {
+      if (err) return res.status(500).json(err);
+      
+
     const email = req.body.email;
-    const  user  =  getemail(email);
+    const  user  =  data[0]
 
     if(!user){
         res.send('user is not there');
@@ -77,21 +65,22 @@ router.post("/password-link", async (req, res)=>{
     }
     const secret = JWT_SECRET;
     const payload = {
-        email: user,
-        id: user,
+        email: user.email,
+        id: user.user_id,
     }
     const token = jwt.sign(payload,secret, {expiresIn: '15m'})
     client.set('password-token',token,{
         EX: ex,
       })
-    const link = `http://localhost:3000/user/reset-password/${user}/${token}`
+    const link = process.env.site_url +`/user/reset-password/${user.user_id}/${token}`
     console.log(link)
     res.send('Password reset link has been sent!')
     const mailinfo = {
-        from: "contact@jeremymichaelsontreeservice.com",
-        to: "lmichaelson@rmsn.us",
+        from: process.env.email_from,
+        to: user.email,
         subject: "password reset link",
         text:link,
+        html:`<a href=${link}><p>Click This Link To Reset Password!</p></a>`
     }
 
     transporter.sendMail(mailinfo, function(error, info){
@@ -101,6 +90,7 @@ router.post("/password-link", async (req, res)=>{
             console.log("Email Sent!")
         }
     })
+  });
 
 })
 
@@ -108,19 +98,14 @@ router.post("/password-link", async (req, res)=>{
 router.post("/password-token/check/:id/:token", async (req,res) =>{
     const { id, token } = req.params;
 
-    //const user = await axios.get(`http://localhost:8800/v1/user/${id}`);
-    //if (!user) {
-    //    return res.json({ status: "User Does Not Exists!"})
-    //}
-
     const secret = JWT_SECRET;
     try{
         const verify = jwt.verify(token, secret);
         const salt = bcrypt.genSaltSync(10);
-        const hash = bcrypt.hashSync( salt);
+      const hash = bcrypt.hashSync(req.body.password, salt);
       const q = "UPDATE users SET `password`=? WHERE user_id=? "
     
-      db.query(q, [req.body.password,id], (err, data) => {
+      db.query(q, [hash,id], (err, data) => {
         if (err) return res.status(500).json(err);
         return res.status(200).json("updated");
       });

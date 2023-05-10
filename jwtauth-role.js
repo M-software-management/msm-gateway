@@ -7,7 +7,7 @@ export const Adminonly = async (req, res, next) =>{
         
         jwt.verify(token,"msmtest", (err, userinfo)=>{
           if(err) return res.status(403).json("Token not vaild!")
-          if(userinfo.role !== "overlord") return res.status(404).json("You can not access this!")
+          if(userinfo.role !== ("overlord" ?? "admin")) return res.status(404).json("You can not access this!")
           next()
       });
     };

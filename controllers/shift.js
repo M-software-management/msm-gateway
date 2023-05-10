@@ -5,7 +5,7 @@ import util from 'util'
 
 
 //const client = createClient({
-  // url: 'redis://192.168.1.5:6379'
+  //url: 'redis://192.168.1.17:49199'
 //})
   //await client.connect();
 
@@ -17,8 +17,8 @@ import util from 'util'
 export const Getshifts = (req, res) => {
   
   const q = req.query.location_id ? 
-    "SELECT * FROM sfhs.shifts WHERE location_id=? AND `hide_shift`= 1 "
-    :"SELECT * FROM sfhs.shifts ";
+    "SELECT * FROM shifts WHERE location_id=? ORDER BY orders"
+    :"SELECT * FROM sfhs.shifts ORDER BY orders";
   
     db.query(q,[req.query.location_id], (err, data)=> {
       if (err) return res.json(err)
@@ -35,8 +35,9 @@ export const Getshifts = (req, res) => {
       jwt.verify(token,"msmtest", (err, userinfo)=>{
         if(err) return res.status(403).json("Token not vaild!")
     
-    const q = "INSERT INTO shifts (`date`,`hours`,`desc`,`hide_shift`,`location_id`) VALUES (?)"
+    const q = "INSERT INTO shifts (`created_by`,`date`,`hours`,`desc`,`hide_shift`,`location_id`) VALUES (?)"
     const values = [
+      userinfo.id,
       req.body.date,
       req.body.hours,
       req.body.description,
@@ -68,12 +69,19 @@ export const Getshifts = (req, res) => {
   }
 
   export const Pickshift = (req, res) => {
-
     const token = req.cookies.access_token
       if(!token) return res.status(403).json("not authenticated!")
       
       jwt.verify(token,"msmtest", (err, userinfo)=>{
+
         if(err) return res.status(403).json("Token not vaild!")
+    const q = "SELECT * FROM request WHERE shift_id=? AND user_id=?";
+
+    db.query(q, [req.params.id, userinfo.id], (err, data) => {
+      if (err) return res.status(500).json(err);
+      if (data.length) return res.status(409).json("You Already Requested This Shift!");
+
+    
     
     const q = "INSERT INTO request (`location_id`,`shift_id`,`user_id`) VALUES (?)"
     const values = [
@@ -87,13 +95,14 @@ export const Getshifts = (req, res) => {
       return res.json("Shift request made!")
     })
     })
+    })
   }
 
 
   export const Getrequest = (req, res) => {
 
     
-    const q = "SELECT `request_id`, r.`location_id`, r.`shift_id`, r.`user_id`, r.`approved`, u.`username`, L.`Name`, `date` FROM request r join users u ON r.user_id=u.user_id join Location L on r.location_id=L.location_uid\ INNER JOIN shifts ON r.shift_id = shifts.shift_id ";
+    const q = "SELECT `request_id`, r.`location_id`, r.`shift_id`, r.`user_id`, r.`approved`, u.`username`, L.`Name`, `date` FROM request r join users u ON r.user_id=u.user_id join Location L on r.location_id=L.location_uid\ INNER JOIN shifts ON r.shift_id = shifts.shift_id WHERE r.location_id=? ";
     
       db.query(q,[req.params.id], (err, data)=> {
         if (err) return res.json(err)
@@ -105,7 +114,7 @@ export const Getshifts = (req, res) => {
       
       const q = "UPDATE shifts SET `date`=?,`hours`=?,`desc`=?,`hide_shift`=? WHERE shift_id=?"
   
-      db.query(q, [req.body.date, req.body.hours, req.body.desc, req.body.show,req.params.id,], (err, data)=> {
+      db.query(q, [req.body.date, req.body.hours, req.body.desc, req.body.hide,req.params.id], (err, data)=> {
         if(err) return res.json(err)
         return res.json("Shift has been update")
       })
@@ -121,7 +130,7 @@ export const Getshifts = (req, res) => {
       const q =  "SELECT * FROM sfhs.shifts WHERE shift_id=?"
         db.query(q,[req.params.id], (err, data)=> {
           if (err) return res.json(err)
-          return res.status(200).json(data);
+          return res.status(200).json(data[0]);
         })
         });
       };
@@ -133,8 +142,23 @@ export const Getshifts = (req, res) => {
     
         db.query(q, [req.params.id], (err, data)=> {
           if(err) return res.json(err)
-          return res.json("Shift has been Approved")
-        })
+         
+          
+          const qw2 = 'SELECT * FROM sfhs.request WHERE request_id=?'
+    
+          db.query(qw2, [req.params.id], (err, data_2)=> {
+            if(err) return res.json(err)
+           
+            
+          
+
+          const qw = `UPDATE shifts SET is_picked_up='true', picked_user_id=${data_2[0].user_id} WHERE shift_id=${data_2[0].shift_id}`
+    
+          db.query(qw, [req.params.id], (err, data_3)=> {
+            if(err) return res.json(err)
+            return res.json("Shift has been Approved")
+          })
+        })})
       }
 
 
@@ -179,6 +203,23 @@ export const Getshifts = (req, res) => {
             
             const q =  "SELECT `shift_id`,`hide_shift` FROM sfhs.shifts WHERE `hide_shift`= 1 AND shift_id=? "
               db.query(q,[req.params.id], (err, data)=> {
+                if (err) return res.json(err)
+                return res.status(200).json(data);
+              })
+              });
+            };
+
+
+
+          export const GetUsershifts = (req, res) => {
+            const token = req.cookies.access_token
+            if(!token) return res.status(403).json("not authenticated!")
+            
+            jwt.verify(token,"msmtest", (err, userinfo)=>{
+              if(err) return res.status(403).json("Token not vaild!")
+            
+            const q =  "SELECT * FROM sfhs.shifts WHERE `is_picked_up`='true' AND picked_user_id=? "
+              db.query(q,[userinfo.id], (err, data)=> {
                 if (err) return res.json(err)
                 return res.status(200).json(data);
               })

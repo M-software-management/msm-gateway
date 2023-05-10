@@ -1,15 +1,14 @@
 import nodemailer from 'nodemailer'
 
 
-const transporter = nodemailer.createTransport({
-    host: "m16.siteground.biz",
-    port: 465,
+export const transporter = nodemailer.createTransport({
+    host: process.env.host_email_server,
+    port: process.env.email_smtp_port,
     auth:{
-        user:"contact@jeremymichaelsontreeservice.com",
-        pass:"contact2022",
+        user: process.env.auth_email_username,
+        pass: process.env.auth_email_password,
     }
 })
 
 
 
-export default Mail

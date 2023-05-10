@@ -12,21 +12,29 @@ import nodemailer from 'nodemailer'
 import { Getallworkuser } from './controllers/user.js'
 import cron from 'cron'
 import {SendMailAll} from './cron.js'
+import { logger } from './config/logger.js'
+import path from 'path'
+import * as dotenv from 'dotenv'
+dotenv.config()
+import { transporter } from './Mail.js'
 
 
 
 const app = express();
+
+app.use(logger)
 
 app.use((req,res,next)=>{
     res.header("Access-Control-Allow-Credentials", true)
     next()
 })
 
-//const notif = await Getnotification()
+
+
 
 
 app.use(cors({
-    origin: "https://shifts.rmsn.us",
+    origin: process.env.site_url,
 }));
 app.use(express.json());
 app.use(cookieParser());
@@ -35,13 +43,11 @@ app.use("/v1/user", usersroutes)
 app.use("/v1/work", workroutes)
 app.use("/v1/shift", shiftroutes)
 app.use("/v1/notification", notificationroutes)
-app.use("/uploads", Authtoken, express.static("./uploads"))
-app.get("/cron", SendMailAll)
+app.use("/uploads", express.static("./uploads"))
+app.post("/cron/:id", SendMailAll)
 
 
 
-
-const router = express.Router()
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, "./uploads");
@@ -53,33 +59,26 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
+
 app.post('/v1/upload', upload.single('file'), (req, res) => {
   const file = req.file;
-  res.status(200).json(file.filename);
+  res.status(200).json(process.env.api_url + '/uploads/' + file.filename);
 })
 
 
-const transporter = nodemailer.createTransport({
-    host: "smtp.mailgun.org",
-    port: 587,
-    auth:{
-        user:"no-reply@sfhs.rmsn.us",
-        pass:"8985ec1c2f91fa1010eaa6246a5320ce-f2340574-f8ef4120",
-    }
-})
+
 
 app.post("/v1/email-api", (req,res) => {
-  const not = notif
-  const text = not.body.text;
-  const subject = not.body.subject;
+  const text = req.body.text;
+  const subject = req.body.subject;
   const people  = req.body.to;
   res.send("Email Sent!")
   const mailinfo = {
-    from: " Sfhs Alerts <no-reply@sfhs.rmsn.us>",
+    from: process.env.email_from,
     to: people,
     subject: subject,
     text:text,
-    template: "sfhs-alerts",
+  
 
 }
 
