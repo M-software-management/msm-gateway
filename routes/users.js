@@ -13,20 +13,28 @@ import bcrypt from "bcryptjs";
 import * as dotenv from 'dotenv'
 dotenv.config()
 import { transporter } from "../Mail.js"
-import { client } from "../db.js"
-
-//const client = createClient({
-  // url: 'redis://192.168.1.17:49199'
-//})
-  //await client.connect();
-
-  //client.set = util.promisify(client.set)
-
-  const ex = 3600
+import { render } from '@react-email/render';
 
 const app = express();
 
 app.use(express.json());
+
+
+const client = createClient({
+   url: 'rediss://default:AVNS_A6Py-k5w_BK3pT2VIC2@db-redis-nyc1-68088-do-user-14262902-0.b.db.ondigitalocean.com:25061'
+})
+client.on('error', err => console.log('Redis Client Error', err));
+  await client.connect();
+
+  client.on('connect', function(err){
+    console.log("Redis connected!-users")
+  });
+
+  client.set = util.promisify(client.set)
+
+  const ex = 3600
+
+
 
 
 const JWT_SECRET = process.env.jwt_sign
@@ -80,7 +88,7 @@ router.post("/password-link", async (req, res)=>{
         to: user.email,
         subject: "password reset link",
         text:link,
-        html:`<a href=${link}><p>Click This Link To Reset Password!</p></a>`
+        html: `<a href=${link}><p>Click This Link To Reset Password!</p></a>`
     }
 
     transporter.sendMail(mailinfo, function(error, info){
@@ -93,6 +101,8 @@ router.post("/password-link", async (req, res)=>{
   });
 
 })
+//<a href=${link}><p>Click This Link To Reset Password!</p></a>
+
 
 
 router.post("/password-token/check/:id/:token", async (req,res) =>{

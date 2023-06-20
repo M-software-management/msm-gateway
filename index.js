@@ -17,6 +17,7 @@ import path from 'path'
 import * as dotenv from 'dotenv'
 dotenv.config()
 import { transporter } from './Mail.js'
+import { client } from './db.js'
 
 
 
@@ -34,7 +35,7 @@ app.use((req,res,next)=>{
 
 
 app.use(cors({
-    origin: process.env.site_url,
+    origin: 'http://localhost:3000',
 }));
 app.use(express.json());
 app.use(cookieParser());
@@ -45,6 +46,12 @@ app.use("/v1/shift", shiftroutes)
 app.use("/v1/notification", notificationroutes)
 app.use("/uploads", express.static("./uploads"))
 app.post("/cron/:id", SendMailAll)
+app.get("/hello", (req,res)=>{
+  console.log("lots of code")
+  redisdata = client.get("test")
+  res.status(200).json(redisdata)
+
+})
 
 
 
@@ -77,7 +84,7 @@ app.post("/v1/email-api", (req,res) => {
     from: process.env.email_from,
     to: people,
     subject: subject,
-    text:text,
+    text: text,
   
 
 }

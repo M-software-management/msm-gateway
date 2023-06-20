@@ -10,7 +10,7 @@ const client = twilio(accountSid, authToken);
 
 export const Getnotification = (req, res) => {
   
-  const q = "SELECT * FROM sfhs.Notifications WHERE `sent`=0  "
+  const q = "SELECT * FROM sfhs.Notifications WHERE `seen`=0  "
   
     db.query(q,[req.params.id], (err, data)=> {
       if (err) return res.json(err)
@@ -20,6 +20,18 @@ export const Getnotification = (req, res) => {
   };
 
   
+  export const Seen_nofi = (req, res) => {
+      
+    const q = "UPDATE sfhs.Notifications SET seen=1 WHERE id IN (?)"
+
+    db.query(q, [req.body.id], (err, data)=> {
+      if(err) return res.json(err)
+      return res.json(data)
+    })
+  }
+
+
+
   export const Getnotificationtype = (req, res) => {
   
     const q = "SELECT * FROM sfhs.Notifications WHERE `type`=? AND `sent`=? "
@@ -30,6 +42,30 @@ export const Getnotification = (req, res) => {
       
       });
     };
+
+
+    export const Getnotification_bell_number = (req, res) => {
+      const token = req.cookies.access_token
+      if(!token) return res.status(403).json("not authenticated!")
+      
+      jwt.verify(token,"msmtest", (err, userinfo)=>{
+        if(err) return res.status(403).json("Token not vaild!")
+  
+      const q = "SELECT * FROM sfhs.Notifications WHERE `seen`=0 AND sent_to_user_id=? "
+      
+        db.query(q,[userinfo.id], (err, data)=> {
+          if (err) return res.json(err)
+         const numRows = data.length
+
+const j_data = {
+          "bell_number": numRows,
+          "show_number_count": (data.length>0) ? ("yes"):("no"),
+        }
+
+          return res.status(200).json(j_data);
+      })
+        });
+      };
 
 
 

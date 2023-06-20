@@ -3,8 +3,8 @@ import express, { response } from "express"
 import redis from 'redis'
 import { db } from "../db.js";
 import util from 'util'
-import { createClient } from 'redis';
 import { client } from "../db.js";
+
 
 
 
@@ -19,20 +19,40 @@ const app = express();
 
   const ex = 3600
   app.use(express.json());
-
+//SELECT * FROM sfhs.Location WHERE hide=1;
 export const Getworks = async (req, res) => {
  
-    
-  
-        
-        const q = "SELECT * FROM sfhs.Location WHERE hide=1;"
+        const q = "SELECT * FROM sfhs.work_relationship R JOIN sfhs.Location L WHERE R.work_id=L.location_uid AND R.user_id=4"
          db.query(q, [req.params.id], (err, data) => {
             if (err) return res.status(500).json(err);
            
-            return res.status(200).json(data);
+           const works = (data.map(function(work){ var custom_jsoN = {
+             work_data:{
+             "name": work.Name,
+             "banner": work.banner,
+             "slug": work.slug
+            },
+            work_settings:{
+              "is_admin": work.is_admin,
+              "email_nofi": work.email_nofi,
+              "sms_nofi": work.sms_nofi,
+            },
+          }
+            return custom_jsoN;
+            
+           }
+           
+           )
+           )
+           client.set("test")
+            return res.status(200).json(works);
+
     
     })
   };
+
+
+  //SELECT * FROM sfhs.work_relationship R JOIN sfhs.Location L WHERE R.work_id=L.location_uid AND R.user_id=4
 
 
   export const Getworksadmin = (req, res) => {
@@ -254,3 +274,17 @@ db.query(myquery,[req.params.id], function(err, results, fields) {
 
   //const keep = "SELECT S.* FROM sfhs.shifts S LEFT JOIN sfhs.request R ON S.shift_id=R.shift_id WHERE S.location_id=?"
   //const keep_2 = "SELECT S.*, request_id, user_id, approved FROM sfhs.shifts S LEFT JOIN sfhs.request R ON S.shift_id=R.shift_id WHERE S.location_id=? AND hide_shift=1;"
+
+
+  export const getfaq = async (req, res) => {
+    
+    const q =  "SELECT * FROM sfhs.faq"
+  
+    db.query(q, [req.params.url], (err, data) => {
+      if (err) return res.status(500).json(err);
+
+      return res.status(200).json(data);
+
+    })
+
+  };

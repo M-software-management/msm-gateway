@@ -189,7 +189,7 @@ export const Getshifts = (req, res) => {
           
             db.query(q,[req.query.user_id], (err, data)=> {
               if (err) return res.json(err)
-              return res.status(200).json(data);
+              return res.status(200).json(data)
             });
           };
 
@@ -217,11 +217,22 @@ export const Getshifts = (req, res) => {
             
             jwt.verify(token,"msmtest", (err, userinfo)=>{
               if(err) return res.status(403).json("Token not vaild!")
+              let returnval = {}
+              let error_selector = false
+              let statusobj = {
+                "message":"SUCCESS",
+                "code": 200,
+                "error": error_selector,
+              }
             
             const q =  "SELECT * FROM sfhs.shifts WHERE `is_picked_up`='true' AND picked_user_id=? "
               db.query(q,[userinfo.id], (err, data)=> {
+                returnval.data = data
                 if (err) return res.json(err)
-                return res.status(200).json(data);
+                if(data.length==0){
+                  return res.status(200).json("You Have not been approved for any shifts!");}
+
+                return res.status(200).json({data, "status":statusobj});
               })
               });
             };
