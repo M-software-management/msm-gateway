@@ -20,17 +20,17 @@ const app = express();
 app.use(express.json());
 
 
-const client = createClient({
-   url: 'rediss://default:AVNS_A6Py-k5w_BK3pT2VIC2@db-redis-nyc1-68088-do-user-14262902-0.b.db.ondigitalocean.com:25061'
-})
-client.on('error', err => console.log('Redis Client Error', err));
-  await client.connect();
+//const client = createClient({
+  // url: 'rediss://default:AVNS_A6Py-k5w_BK3pT2VIC2@db-redis-nyc1-68088-do-user-14262902-0.b.db.ondigitalocean.com:25061'
+//})
+//client.on('error', err => console.log('Redis Client Error', err));
+  //await client.connect();
 
-  client.on('connect', function(err){
-    console.log("Redis connected!-users")
-  });
+  //client.on('connect', function(err){
+    //console.log("Redis connected!-users")
+  //});
 
-  client.set = util.promisify(client.set)
+  //client.set = util.promisify(client.set)
 
   const ex = 3600
 
