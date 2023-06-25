@@ -3,7 +3,7 @@ import express, { response } from "express"
 import redis from 'redis'
 import { db } from "../db.js";
 import util from 'util'
-import { client } from "../db.js";
+//import { client } from "../db.js";
 
 
 
@@ -44,7 +44,7 @@ export const Getworks = async (req, res) => {
            
            )
            )
-           client.set("test")
+         
             return res.status(200).json(works);
 
     

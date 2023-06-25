@@ -30,18 +30,18 @@ export const db = mysql.createConnection({
 
 
 
-export const client = createClient({
-   url: "rediss://default:AVNS_A6Py-k5w_BK3pT2VIC2@db-redis-nyc1-68088-do-user-14262902-0.b.db.ondigitalocean.com:25061"
-})
-client.on('error', err => console.log('Redis Client Error', err));
+//export const client = createClient({
+  // url: "rediss://default:AVNS_A6Py-k5w_BK3pT2VIC2@db-redis-nyc1-68088-do-user-14262902-0.b.db.ondigitalocean.com:25061"
+//})
+//client.on('error', err => console.log('Redis Client Error', err));
 
-  await client.connect();
+  //await client.connect();
   
   
 
-  client.on('connect', function(err){
-    console.log("Redis connected!")
-  });
+  //client.on('connect', function(err){
+    //console.log("Redis connected!")
+  //});
 
 
   

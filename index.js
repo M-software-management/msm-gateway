@@ -17,7 +17,7 @@ import path from 'path'
 import * as dotenv from 'dotenv'
 dotenv.config()
 import { transporter } from './Mail.js'
-import { client } from './db.js'
+//import { client } from './db.js'
 
 
 
