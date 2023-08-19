@@ -13,6 +13,7 @@ import { Getallworkuser } from './controllers/user.js'
 import cron from 'cron'
 import {SendMailAll} from './cron.js'
 import { logger } from './config/logger.js'
+import rateLimit from 'express-rate-limit'
 import path from 'path'
 import * as dotenv from 'dotenv'
 dotenv.config()
@@ -22,6 +23,14 @@ import { transporter } from './Mail.js'
 
 
 const app = express();
+
+const limiter = rateLimit({
+	windowMs: 15 * 60 * 1000, // 15 minutes
+	max: 1000, // Limit each IP to 100 requests per `window` (here, per 15 minutes)
+	standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
+	legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+})
+app.use(limiter)
 
 app.use(logger)
 
@@ -42,7 +51,7 @@ app.use(cookieParser());
 app.use("/v1/auth", authroutes)
 app.use("/v1/user", usersroutes)
 app.use("/v1/work", workroutes)
-app.use("/v1/shift", shiftroutes)
+app.use("/v1/job", shiftroutes)
 app.use("/v1/notification", notificationroutes)
 app.use("/uploads", express.static("./uploads"))
 app.post("/cron/:id", SendMailAll)

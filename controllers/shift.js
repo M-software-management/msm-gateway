@@ -27,6 +27,17 @@ export const Getshifts = (req, res) => {
     });
   };
 
+  export const GetJobs = (req, res) => {
+  
+    const q =  "SELECT * FROM `wcj-main`.jobs"
+    
+      db.query(q,[req.query.location_id], (err, data)=> {
+        if (err) return res.json(err)
+        return res.status(200).json(data);
+      
+      });
+    };
+
 
   export const Addshift = (req, res) => {
     const token = req.cookies.access_token

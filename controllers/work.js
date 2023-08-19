@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken";
-import express, { response } from "express"
+import express, { json, response } from "express"
 import redis from 'redis'
 import { db } from "../db.js";
 import util from 'util'
@@ -20,7 +20,7 @@ const app = express();
   const ex = 3600
   app.use(express.json());
 //SELECT * FROM sfhs.Location WHERE hide=1;
-export const Getworks = async (req, res) => {
+export const Getworks_old = async (req, res) => {
  
         const q = "SELECT * FROM sfhs.work_relationship R JOIN sfhs.Location L WHERE R.work_id=L.location_uid AND R.user_id=4"
          db.query(q, [req.params.id], (err, data) => {
@@ -65,6 +65,15 @@ export const Getworks = async (req, res) => {
 });
 };
 
+export const Getworks = (req, res) => {
+        
+  const q = "SELECT * FROM sfhs.jobs;"
+   db.query(q, [req.params.id], (err, data) => {
+      if (err) return res.status(500).json(err);
+      return res.status(200).json(data);
+
+});
+};
  
   export const Getwork = async (req, res) => {
   
@@ -278,12 +287,14 @@ db.query(myquery,[req.params.id], function(err, results, fields) {
 
   export const getfaq = async (req, res) => {
     
-    const q =  "SELECT * FROM sfhs.faq"
+    const q =  "SELECT `random` FROM sfhs.faq"
   
-    db.query(q, [req.params.url], (err, data) => {
+    db.query(q, [req.params.url], (err, data2) => {
       if (err) return res.status(500).json(err);
 
-      return res.status(200).json(data);
+      const oneresult = data2[0]
+      const oneparsed = JSON.parse(oneresult.random)
+      return res.status(200).json({"job_data" : oneparsed});
 
     })
 

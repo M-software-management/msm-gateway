@@ -12,17 +12,17 @@ dotenv.config()
 const url_redis = process.env.REDIS_URL
 
 export const db = mysql.createConnection({
-    host:"db-mysql-nyc1-11606-do-user-14262902-0.b.db.ondigitalocean.com",
-    user:"adminnode",
-    password:"AVNS_xhzJrc-Dr_BOeyxxZJZ",
-    database:"sfhs",
-    port: 25060,
-    insecureAuth : true,
-    ssl  : {
-      ca : fs.readFileSync('./ca-certificate.crt'),
+    host:"192.168.1.25",
+    user:"node",
+    password:"node1234",
+    database:"wcj-main",
+    port: 32773,
+    //insecureAuth : true,
+   // ssl  : {
+     // ca : fs.readFileSync('./ca-certificate.crt'),
       
       
-    }
+   // }
     
     
 })

@@ -1,11 +1,11 @@
 import express from "express"
-import {Getshifts, Addshift, deleteshift, Pickshift, Getrequest, Getshift, Updateshift, Approverequest, Getonerequest, Deleterequest, Getuserequest, GetshiftHide, GetUsershifts} from "../controllers/shift.js"
+import {Getshifts, Addshift, deleteshift, Pickshift, Getrequest, Getshift, Updateshift, Approverequest, Getonerequest, Deleterequest, Getuserequest, GetshiftHide, GetUsershifts, GetJobs} from "../controllers/shift.js"
 import {Adminonly, overlord} from "../jwtauth-role.js"
 import Authtoken from "../jwtauth.js"
 
 const router = express.Router()
 
-router.get("/", Getshifts)
+router.get("/", GetJobs)
 router.put("/acm/update/:id", Updateshift)
 router.get("/s/:id", Getshift)
 router.post("/acm/add", Addshift)
