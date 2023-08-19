@@ -24,6 +24,8 @@ import { transporter } from './Mail.js'
 
 const app = express();
 
+const port = process.env.PORT || 8800;
+
 const limiter = rateLimit({
 	windowMs: 15 * 60 * 1000, // 15 minutes
 	max: 1000, // Limit each IP to 100 requests per `window` (here, per 15 minutes)
@@ -40,12 +42,23 @@ app.use((req,res,next)=>{
 })
 
 
+app.get('/', async (_req, res, _next) => {
+
+  const healthcheck = {
+      uptime: process.uptime(),
+      message: 'OK',
+      timestamp: Date.now()
+  };
+  try {
+      res.send(healthcheck);
+  } catch (error) {
+      healthcheck.message = error;
+      res.status(503).send();
+  }
+});
 
 
-
-app.use(cors({
-    origin: 'http://localhost:3000',
-}));
+app.use(cors({}));
 app.use(express.json());
 app.use(cookieParser());
 app.use("/v1/auth", authroutes)
@@ -111,6 +124,6 @@ transporter.sendMail(mailinfo, function(error, info){
 
 
 
-app.listen(8800, () => {
-    console.log('connected to backend!')
+app.listen(port, () => {
+    console.log(`connected to backend! On port ${port}`)
 });

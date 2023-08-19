@@ -12,11 +12,11 @@ dotenv.config()
 const url_redis = process.env.REDIS_URL
 
 export const db = mysql.createConnection({
-    host:"192.168.1.25",
-    user:"node",
-    password:"node1234",
-    database:"wcj-main",
-    port: 32773,
+    host: process.env.mysql_host,
+    user: process.env.mysql_user,
+    password: process.env.mysql_password,
+    database: process.env.mysql_database,
+    port: process.env.mysql_port,
     //insecureAuth : true,
    // ssl  : {
      // ca : fs.readFileSync('./ca-certificate.crt'),
