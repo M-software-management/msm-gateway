@@ -29,7 +29,7 @@ export const Getshifts = (req, res) => {
 
   export const GetJobs = (req, res) => {
   
-    const q =  "SELECT * FROM `wcj-main`.jobs"
+    const q =  "SELECT * FROM `msm_wcj`.jobs"
     
       db.query(q,[req.query.location_id], (err, data)=> {
         if (err) return res.json(err)
