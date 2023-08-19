@@ -17,7 +17,7 @@ export const db = mysql.createConnection({
     password: process.env.mysql_password,
     database: process.env.mysql_database,
     port: process.env.mysql_port,
-    //insecureAuth : true,
+    insecureAuth : true,
    // ssl  : {
      // ca : fs.readFileSync('./ca-certificate.crt'),
       
