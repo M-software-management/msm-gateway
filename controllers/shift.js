@@ -2,7 +2,15 @@ import { db } from "../db.js";
 import jwt from "jsonwebtoken";
 import { createClient } from 'redis';
 import util from 'util'
-
+import axios from 'axios';
+import { v4 as uuidv4} from 'uuid'
+import fs, { link } from 'fs'
+import path from 'path';
+import { dirname } from 'path';
+const __dirname = path.resolve();
+const filePath = path.join(__dirname, './controllers/test.html');
+//import WPAPI from "wpapi";
+  //  const wp = new WPAPI({ endpoint: "https://westcentralmnjobs.com/wp-json" });
 
 //const client = createClient({
   //url: 'redis://192.168.1.17:49199'
@@ -12,6 +20,243 @@ import util from 'util'
   //client.set = util.promisify(client.set)
 
   const ex = 3600
+
+
+  //------------------------------------------------------------------------------------------------------------------------------------------
+  
+  const job_data_api_url = "https://sfhs.hcshiring.com/29038835/api/jobs?category=&distance=-1&filters=&internal=false&job=&jobSelected=false&location=&openOnly=false&orgId=&page=8"
+
+  const job_data_api_url_with_page = "https://sfhs.hcshiring.com/29038835/api/jobs?category=&distance=-1&filters=&internal=false&job=&jobSelected=false&location=&openOnly=false&orgId=&page=8"
+
+
+  export const Get_new_jobs = async (req, url ,res) => {
+
+    const parsedResults = []
+    var indexPage = 1
+    var totalPage = 0
+    
+   var i
+    for (let i = 0; i < 10; i++) {
+     
+    }
+    const new_job_data = await axios.get(job_data_api_url); 
+     //console.log(new_job_data.data.meta)
+    // totalPage = page[page.length-1] 
+    
+  const good_data_almost = JSON.stringify(new_job_data.data)
+  const good_json_good = JSON.parse(good_data_almost)
+ 
+   
+    const array = new_job_data.data.jobs;
+     array.forEach(element => {
+
+      const qw = "SELECT * FROM msm_wcj.jobs WHERE external_id=?";
+
+      db.query(qw, [element.id], (err, data) => {
+        
+        
+     // console.log(data)
+  
+      const uid = uuidv4()
+      
+      
+       const q = "INSERT IGNORE INTO msm_wcj.jobs (`job_id`,`job_title`,`summary`,`organization`,`street`,`city`,`state`,`zip`,`external_id`) VALUES (?)"
+      const values = [
+      uid,
+      element.job_title,
+      element.summary,
+      element.organization,
+      element.street,
+      element.city,
+      element.state,
+      element.zip,
+     element.id
+      
+    ];
+    
+      db.query(q,[values], (err, data_24)=> {
+       
+       // console.log(data_24)
+
+
+      });
+      console.log(new_job_data.data.meta)
+    return new_job_data.data.meta;
+    })
+    
+    });
+    
+    };
+
+
+
+
+
+
+    export const scrape_jobs_api = async (req,res) => {
+
+      const parsedResults = []
+      var indexPage = 1
+      var totalPage = 0
+
+      const job_data_api_url_with_page_22 = "https://sfhs.hcshiring.com/0d971156/api/jobs?category=&distance=-1&filters=&internal=false&job=&jobSelected=false&location=&openOnly=false&orgId=&page="
+
+ var i
+      for (i = 0; i < totalPage; i++) {
+
+        const new_job_data = await axios.get(job_data_api_url_with_page_22 + indexPage); 
+        console.log(new_job_data)
+totalPage = new_job_data.meta.totalPage
+        array.forEach(element => {
+
+          const qw = "SELECT * FROM msm_wcj.jobs WHERE external_id=?";
+    
+          db.query(qw, [element.id], (err, data) => {
+            if(data.length==0){
+                  return res.status(200).json("job has already been added!");}
+            
+         // console.log(data)
+      
+          const uid = uuidv4()
+          
+          
+           const q = "INSERT IGNORE INTO msm_wcj.jobs (`job_id`,`job_title`,`summary`,`organization`,`street`,`city`,`state`,`zip`,`external_id`) VALUES (?)"
+          const values = [
+          uid,
+          element.job_title,
+          element.summary,
+          element.organization,
+          element.street,
+          element.city,
+          element.state,
+          element.zip,
+         element.id
+          
+        ];
+        
+          db.query(q,[values], (err, data_24)=> {
+           
+           // console.log(data_24)
+    
+
+
+           return res.status(200).json("User has been created.");
+          });
+         
+        })
+        
+        });
+      }
+
+    }
+    
+
+
+
+
+
+
+
+
+
+    export const Scrape_all_jobs_than_push = async (req,res) => {
+
+      const parsedResults = []
+      var indexPage = 1
+      var totalPage = 1
+
+      const job_data_api_url_with_page_22 = "https://sfhs.hcshiring.com/0d971156/api/jobs?category=&distance=-1&filters=&internal=false&job=&jobSelected=false&location=&openOnly=false&orgId=&page="
+
+      var i
+      for (i = 0; i < totalPage; i++) {
+      const new_job_data = await axios.get(job_data_api_url_with_page_22 + indexPage); 
+      
+var indexPage
+var totalPage
+      indexPage = new_job_data.data.meta.page;
+      totalPage = new_job_data.data.meta.totalPages;
+      parsedResults.push(new_job_data.data.jobs)
+      }
+
+      console.dir(parsedResults);
+      // Write countries array in countries.json file
+      fs.writeFile("coutries.json", JSON.stringify(parsedResults, null, 2), (err) => {
+        if (err) {
+          console.error(err);
+          return;
+        }
+        console.log("Successfully written data to file");
+      });
+
+
+
+      
+    }
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   
+
+    export const trigger_sfhs_jobs_scrape = async (req, res) => {
+      
+    
+    try{
+      const res_2 = await Get_new_jobs(job_data_api_url)
+      console.log(res_2)
+
+     if(res_2.page<res_2.meta.totalPages){
+        const res_2 = await Get_new_jobs(job_data_api_url_with_page + res_2.meta.page + 1)
+        
+      }
+        }catch(err){
+
+            console.log(err)
+            if (err) return err
+          }
+          
+          
+          
+          };
+      
+         
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
 
 
 export const Getshifts = (req, res) => {
@@ -27,6 +272,49 @@ export const Getshifts = (req, res) => {
     });
   };
 
+
+
+ // export const Getdata_from_wordpress = (req, res) => {
+   // const token = { username: "admin", password: "XXX XXX XXX XXX" };
+    //const post_data = {
+      //title: "My First API Post",
+      //content: "Hello world! This is my first post using the WordPress REST API.",
+    //};
+    
+   // wp.posts()
+     // .auth(token)
+      //.create(post_data)
+      //.then((response) => {
+        //console.log("Article posted:", response);
+      //})
+      //.catch((error) => {
+        //console.error(error);
+      //});
+    //};
+
+
+    export const Getdata_from_test = async (req, res) => {
+    try{
+
+const res_data = await axios.post("https://westcentralmnjobs.com/wp-json/jwt-auth/v1/token",{
+  username: "nodejs-cli",
+  password:"EQo&ZK(#zNm4)Qf1XZ!EgHHz",
+  headers: {
+    Accept: "application/json",
+    "User-Agent": "axios 0.21.1"
+  }
+})
+ console.log(user.token)
+        localStorage.setItem('jwt', user.token)
+ return res.status(200).json(res_data);
+
+
+    }catch(err){
+      console.log(err)
+    }
+      };
+
+      
   export const GetJobs = (req, res) => {
   
     const q =  "SELECT * FROM `msm_wcj`.jobs"
@@ -132,17 +420,12 @@ export const Getshifts = (req, res) => {
     }
 
     export const Getshift = (req, res) => {
-      const token = req.cookies.access_token
-      if(!token) return res.status(403).json("not authenticated!")
-      
-      jwt.verify(token,"msmtest", (err, userinfo)=>{
-        if(err) return res.status(403).json("Token not vaild!")
-      
-      const q =  "SELECT * FROM sfhs.shifts WHERE shift_id=?"
+     
+      const q =  "SELECT * FROM msm_wcj.jobs WHERE job_id=?"
         db.query(q,[req.params.id], (err, data)=> {
           if (err) return res.json(err)
           return res.status(200).json(data[0]);
-        })
+       
         });
       };
 

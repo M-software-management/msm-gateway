@@ -1,0 +1,29 @@
+
+[
+       {
+          "event_type":"rmsn_organic_impression",
+          "triggered_on": 1698166756111,
+          "event_items": [
+         { 
+          "id" : "1716504189868867851",   
+          "identity_user_id": 65241578,
+          "is_logged_in": true,
+          "job_id": 3234902012
+         }
+      ],
+
+          "event_namespace": {
+            "page":"home",
+            "page_url": "https://westcentralmnjobs.com",
+            "component":"job_array_list_home_page",
+            "element":"button",
+            "action":"click",
+            "client":"chrome_mac"
+         },
+         "client_event_sequence_start_timestamp": 1698159092166,
+         "client_event_sequence_number": 31,
+         "client_app_id": "3033300"
+
+
+         }
+]
