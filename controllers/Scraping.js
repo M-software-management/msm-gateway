@@ -9,7 +9,7 @@ const __dirname = path.resolve();
 const filePath = path.join(__dirname, './controllers/test.html');
 import dotenv from 'dotenv'; // Import the dotenv library to load environment variables from a .env file
 dotenv.config();
-import { WordPress } from './WordPress.js';
+
 
 
 
@@ -204,8 +204,6 @@ const wpCofig = {
 };
 
 // Create an instance of the WordPress class
-const wp = new WordPress(wpCofig);
-
 
 export async function createPost(post) {
   try {
