@@ -9,9 +9,34 @@ import path from 'path';
 import { dirname } from 'path';
 const __dirname = path.resolve();
 const filePath = path.join(__dirname, './controllers/test.html');
-//import WPAPI from "wpapi";
-  //  const wp = new WPAPI({ endpoint: "https://westcentralmnjobs.com/wp-json" });
 
+import WPAPI from "wpapi";
+    const wp = new WPAPI({
+       endpoint: "https://westcentralmnjobs.com/wp-json",
+       username: 'nodejs-cli',
+      password: 'EQo&ZK(#zNm4)Qf1XZ!EgHHz',
+ });
+
+ //export const Get_all_kids = async (req, res) => {
+        
+// const data_wp_test = await wp.get('posts')
+ 
+ //     console.log(data_wp_test. _levels)
+   //   return data_wp_test
+
+
+//};
+ 
+
+//const data_wp_test = await wp.post().get().then(function( response ) {
+  // "response" will hold all properties of your newly-created post,
+  // including the unique `id` the post was assigned on creation
+  //console.log( response );
+//})
+//console.log(data_wp_test)
+
+
+ 
 //const client = createClient({
   //url: 'redis://192.168.1.17:49199'
 //})
@@ -96,8 +121,8 @@ const filePath = path.join(__dirname, './controllers/test.html');
     export const scrape_jobs_api = async (req,res) => {
 
       const parsedResults = []
-      var indexPage = 1
-      var totalPage = 0
+      var indexPage = 10
+      var totalPage = 22
 
       const job_data_api_url_with_page_22 = "https://sfhs.hcshiring.com/0d971156/api/jobs?category=&distance=-1&filters=&internal=false&job=&jobSelected=false&location=&openOnly=false&orgId=&page="
 
@@ -106,14 +131,15 @@ const filePath = path.join(__dirname, './controllers/test.html');
 
         const new_job_data = await axios.get(job_data_api_url_with_page_22 + indexPage); 
         console.log(new_job_data)
-totalPage = new_job_data.meta.totalPage
-        array.forEach(element => {
+totalPage = new_job_data.data.meta.totalPages
+const all_jobs = new_job_data.data.jobs
+all_jobs.forEach(element => {
 
           const qw = "SELECT * FROM msm_wcj.jobs WHERE external_id=?";
     
           db.query(qw, [element.id], (err, data) => {
-            if(data.length==0){
-                  return res.status(200).json("job has already been added!");}
+            //if(data.length==0){
+                  //return res.status(200).json("job has already been added!");}
             
          // console.log(data)
       
@@ -140,7 +166,7 @@ totalPage = new_job_data.meta.totalPage
     
 
 
-           return res.status(200).json("User has been created.");
+           return res.end("User has been created.");
           });
          
         })
@@ -148,7 +174,9 @@ totalPage = new_job_data.meta.totalPage
         });
       }
 
+
     }
+    
     
 
 

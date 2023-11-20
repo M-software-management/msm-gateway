@@ -63,3 +63,15 @@ export const Get_all_kids = (req, res) => {
   
   });
   };
+
+//test code to return a array of events
+
+  export const Get_all_events_test = (req, res) => {
+        
+    const q = "SELECT * FROM msm_wcj.data_analytics;"
+     db.query(q, [req.params.id], (err, data) => {
+        if (err) return res.status(500).json(err);
+        return res.status(200).json(data);
+  
+  });
+  };

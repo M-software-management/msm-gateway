@@ -26,6 +26,7 @@ import { makeExecutableSchema } from '@graphql-tools/schema'
 
 import { buildSchema } from "graphql";
 import Toyroutes from './routes/toys.js'
+import Eventsroutes from './routes/events.js'
 
 
 
@@ -167,6 +168,7 @@ app.use("/v1/user", usersroutes)
 app.use("/v1/work", workroutes)
 app.use("/v1/job", shiftroutes)
 app.use("/v1/toy", Toyroutes)
+app.use("/v1/event", Eventsroutes)
 app.use("/v1/notification", notificationroutes)
 app.use("/uploads", express.static("./uploads"))
 app.post("/cron/:id", SendMailAll)

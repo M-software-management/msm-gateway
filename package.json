@@ -42,6 +42,10 @@
     "superagent": "^8.1.2",
     "twilio": "^4.10.0",
     "uuid": "^9.0.0",
-    "wpapi": "^2.0.0-alpha.1"
+    "wpapi": "^2.0.0-alpha.1",
+    "wpapi-fork": "^2.0.0-alpha.1"
+  },
+  "devDependencies": {
+    "@types/wpapi": "^1.1.4"
   }
 }
